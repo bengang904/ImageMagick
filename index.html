@@ -14,53 +14,103 @@
       --border: #222222;
       --mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
     }
+
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; border-radius: 0 !important; }
-    body { background-color: var(--bg); color: var(--text); font-family: var(--mono); margin: 0; padding: 20px; display: flex; justify-content: center; min-height: 100vh; }
+    
+    body { 
+      background-color: var(--bg); 
+      color: var(--text); 
+      font-family: var(--mono); 
+      margin: 0; 
+      padding: 20px; 
+      display: flex; 
+      justify-content: center; 
+      min-height: 100vh; 
+    }
+
     .app-container { width: 100%; max-width: 700px; display: flex; flex-direction: column; gap: 15px; }
+    
     .card { background-color: var(--card); border: 1px solid var(--border); padding: 24px; position: relative; }
-    .label { font-size: 10px; color: var(--dim); margin-bottom: 15px; display: block; letter-spacing: 2px; text-transform: uppercase; border-left: 2px solid var(--accent); padding-left: 10px; }
+    
+    .label { 
+      font-size: 10px; 
+      color: var(--dim); 
+      margin-bottom: 15px; 
+      display: block; 
+      letter-spacing: 2px; 
+      text-transform: uppercase; 
+      border-left: 2px solid var(--accent); 
+      padding-left: 10px; 
+    }
+
     .status-box { font-size: 11px; color: var(--accent); padding: 12px; background: #000; border: 1px solid var(--border); margin-bottom: 10px; opacity: 0.8; }
-    textarea { width: 100%; height: 100px; background: #000; color: var(--accent); border: 1px solid var(--border); padding: 15px; font-family: var(--mono); font-size: 14px; line-height: 1.5; resize: vertical; outline: none; }
-    .btn-main { width: 100%; background: var(--accent); color: #000; border: none; padding: 18px; cursor: pointer; font-size: 13px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; transition: all 0.2s; }
+
+    textarea { 
+      width: 100%; 
+      height: 100px; 
+      background: #000; 
+      color: var(--accent); 
+      border: 1px solid var(--border); 
+      padding: 15px; 
+      font-family: var(--mono); 
+      font-size: 14px; 
+      line-height: 1.5; 
+      resize: vertical; 
+      outline: none; 
+    }
+
+    .btn-main { 
+      width: 100%; 
+      background: var(--accent); 
+      color: #000; 
+      border: none; 
+      padding: 18px; 
+      cursor: pointer; 
+      font-size: 13px; 
+      font-weight: 900; 
+      text-transform: uppercase; 
+      letter-spacing: 2px; 
+      transition: all 0.2s; 
+    }
     .btn-main:hover { filter: brightness(1.1); }
     .btn-main:disabled { background: var(--dim); cursor: not-allowed; }
-    #log-container { margin-top: 10px; height: 180px; background: #000; border: 1px solid var(--border); padding: 12px; overflow-y: auto; font-size: 11px; color: #888; line-height: 1.6; }
-    .log-entry { border-bottom: 1px solid #111; padding: 2px 0; }
-    .log-success { color: var(--accent); }
+
+    /* 日志容器及美化后的滚动条 */
+    #log-container { 
+      margin-top: 10px; 
+      height: 220px; 
+      background: #000; 
+      border: 1px solid var(--border); 
+      padding: 12px; 
+      overflow-y: auto; 
+      font-size: 11px; 
+      color: #888; 
+      line-height: 1.6; 
+      scrollbar-width: thin;
+      scrollbar-color: var(--accent) #000;
+    }
+
+    .log-entry { border-bottom: 1px solid #111; padding: 4px 0; word-break: break-all; }
+    .log-success { color: var(--accent); font-weight: bold; }
     .log-error { color: #ff4444; }
     .log-info { color: #5bc0de; }
-    #preview-area {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, 220px);
-    justify-content: center;
-    gap: 12px;
-    margin-top: 10px;
-}
-    #preview-area img { width: 100%; border: 1px solid var(--border); background: #111; }
-    .preview-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-textarea::-webkit-scrollbar {
-    width: 8px;
-}
 
-textarea::-webkit-scrollbar-track {
-    background: #000;
-}
-
-textarea::-webkit-scrollbar-thumb {
-    background: var(--accent);
-    border: 1px solid #000;
-}
-
-textarea::-webkit-scrollbar-thumb:hover {
-    filter: brightness(1.2);
-}
+    /* Webkit 滚动条样式 */
+    #log-container::-webkit-scrollbar, textarea::-webkit-scrollbar {
+      width: 6px;
+    }
+    #log-container::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track {
+      background: #000;
+    }
+    #log-container::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb {
+      background: var(--dim);
+      border: 1px solid #000;
+    }
+    #log-container::-webkit-scrollbar-thumb:hover, textarea::-webkit-scrollbar-thumb:hover {
+      background: var(--accent);
+    }
   </style>
 </head>
-
 <body>
   <div class="app-container">
     <div class="card">
@@ -81,18 +131,18 @@ textarea::-webkit-scrollbar-thumb:hover {
         <div class="log-entry">系统就绪。请授权工作目录。</div>
       </div>
     </div>
-    <div id="preview-area"></div>
   </div>
+
   <script type='module'>
     import * as Magick from './wasm-imagemagick/magickApi.js';
+    
     let directoryHandle = null;
     const dom = {
       auth: document.getElementById("auth-btn"),
       exec: document.getElementById("execute-btn"),
       status: document.getElementById("dir-status"),
       cmd: document.getElementById("text-area"),
-      logs: document.getElementById("log-container"),
-      preview: document.getElementById("preview-area")
+      logs: document.getElementById("log-container")
     };
 
     const appendLog = (msg, type = '') => {
@@ -121,7 +171,6 @@ textarea::-webkit-scrollbar-thumb:hover {
       if (!fullCmd) return;
 
       dom.exec.disabled = true;
-      dom.preview.innerHTML = "";
       
       try {
         const parts = fullCmd.split(/\s+/).filter(p => p.length > 0);
@@ -129,7 +178,9 @@ textarea::-webkit-scrollbar-thumb:hover {
         const possibleFiles = commandArray.filter(p => p.includes('.') && !p.startsWith('-'));
         const outputName = commandArray[commandArray.length - 1]; 
         const inputNames = possibleFiles.filter(f => f !== outputName);
+
         appendLog(`解析指令: ${fullCmd}`, 'log-info');
+        
         const inputFiles = [];
         for (const name of inputNames) {
           try {
@@ -146,28 +197,25 @@ textarea::-webkit-scrollbar-thumb:hover {
         if (inputFiles.length === 0 && inputNames.length > 0) {
           throw new Error("没有找到任何可用的输入文件。");
         }
+
         appendLog("WASM 核心计算中...");
+        
         const result = await Magick.execute({
           inputFiles: inputFiles,
           commands: [commandArray]
         });
+
         if (result.outputFiles && result.outputFiles.length > 0) {
           for (const outFile of result.outputFiles) {
             const newHandle = await directoryHandle.getFileHandle(outFile.name, { create: true });
             const writable = await newHandle.createWritable();
             await writable.write(outFile.buffer);
             await writable.close();
-            appendLog(`写入成功: ${outFile.name}`, 'log-success');
-            const url = URL.createObjectURL(new Blob([outFile.buffer]));
-            dom.preview.insertAdjacentHTML('beforeend', `
-              <div class="preview-item">
-                <span style="font-size:9px; color:var(--dim)">${outFile.name}</span>
-                <img src="${url}">
-              </div>
-            `);
+            appendLog(`写入磁盘成功: ${outFile.name}`, 'log-success');
           }
+          appendLog(`任务完成，处理了 ${result.outputFiles.length} 个文件。`, 'log-info');
         } else {
-          appendLog("执行成功，但没有产生输出文件。", 'log-info');
+          appendLog("执行成功，但未产生预期的输出文件。", 'log-info');
         }
 
       } catch (err) {
